@@ -853,13 +853,15 @@ function viewPlanet() {
   const p = P[state.cur], s = ps(p.id);
   const k = ui.instr;
   const allQ = p.report.every((_, i) => s.q[i] && s.q[i].ok);
+  // 탐사 장비를 모두 살펴봐야 보고서 보기가 열려요
+  const nSeen = Object.keys(INSTR).filter(key => s.seen.includes(key)).length, allSeen = nSeen === Object.keys(INSTR).length;
   const idx = PLANETS.indexOf(p), next = PLANETS.slice(idx + 1).concat(PLANETS.slice(0, idx)).find(q => !planetDone(q.id));
   const qs = p.report.map((q, i) => {
     const r = s.q[i] || {}, parts = q.t.split('___');
     const blank = r.ok ? `<span class="blank ok">${q.a}</span>` : '<span class="blank">?</span>';
     const fb = ui.fb[p.id + i];
     return `<div class="q"><div class="s">${i + 1}. ${parts[0]}${blank}${parts[1] || ''}</div>
-${r.ok ? '' : `<div class="opts">${shuffled(q.o, q.t + state.m1try).map(o => `<button class="opt${(r.no || []).includes(o) ? ' no' : ''}" data-act="ans" data-i="${i}" data-o="${esc(o)}">${o}</button>`).join('')}</div>`}
+${r.ok || !allSeen ? '' : `<div class="opts">${shuffled(q.o, q.t + state.m1try).map(o => `<button class="opt${(r.no || []).includes(o) ? ' no' : ''}" data-act="ans" data-i="${i}" data-o="${esc(o)}">${o}</button>`).join('')}</div>`}
 ${fb ? `<div class="fb ${fb.ok ? 'ok' : 'bad'}">${fb.msg}</div>` : ''}</div>`;
   }).join('');
   const iq = p.inq, ir = s.inq || {};
@@ -871,7 +873,7 @@ ${ir.ok ? `<p class="fb ok">✔ ${iq.o[iq.a]}</p><div class="explain">${iq.ex}</
 <section class="panel"><div class="hero">${planetSVG(p.id, 120)}<div><h2>${p.ko} <span class="en">${p.en}</span></h2><p class="muted">태양에서 ${p.order}번째 행성</p></div></div>
 <div class="instr">${Object.entries(INSTR).map(([key, v]) => `<button class="${k === key ? 'on ' : ''}${s.seen.includes(key) ? 'seen' : ''}" data-act="instr" data-k="${key}" aria-pressed="${k === key}"><span class="ic">${v.ic}</span>${v.name}</button>`).join('')}</div>
 <div class="evidence" aria-live="polite">${k ? evidence(p, k) : '<div class="ev-empty">위의 탐사 장비를 눌러<br>증거를 모아 보세요 🔍</div>'}</div></section>
-<section class="panel report"><h3>📋 ${p.ko} 탐사 보고서</h3><p class="muted" style="font-size:14px">증거를 보고 빈칸에 들어갈 말을 고르세요.</p>${qs}${inq}${done}</section></div>`;
+<section class="panel report"><h3>📋 ${p.ko} 탐사 보고서</h3><p class="muted" style="font-size:14px">증거를 보고 빈칸에 들어갈 말을 고르세요.</p>${allSeen ? '' : `<p class="fb bad">🔒 탐사 장비 6개를 모두 눌러 증거를 살펴보면 보기가 열려요. (지금 ${nSeen}/6)</p>`}${qs}${inq}${done}</section></div>`;
 }
 
 function choiceQ(q, r, i) {
@@ -1520,6 +1522,7 @@ app.addEventListener('click', async e => {
   } else if (a === 'photo') { ui.photo = +t.dataset.j; render(); }
   else if (a === 'ans') {
     const p = P[state.cur], s = ps(p.id), i = +t.dataset.i, o = t.dataset.o, q = p.report[i];
+    if (!Object.keys(INSTR).every(key => s.seen.includes(key))) return;
     const r = s.q[i] || (s.q[i] = { no: [] });
     if (o === q.a) { r.ok = true; ui.fb[p.id + i] = { ok: true, msg: '✔ 정답! 증거를 잘 찾았어요.' }; }
     else { r.no.push(o); ui.fb[p.id + i] = { ok: false, msg: `🔎 다시 생각해 봐요. <b>${INSTR[q.h].ic} ${INSTR[q.h].name}</b>의 증거를 살펴보세요.` }; }
