@@ -684,7 +684,7 @@ const QUIZ = [
 const KEY = 'planet-mission-v3';
 const fresh = () => ({ view: 'intro', num: '', name: '', cur: null, planets: {}, lab: { c: {}, concl: null, tbl: { placed: {}, miss: 0 }, quiz: {} }, game: { best: 0, bestRight: 0, plays: 0 }, alg: { wins: 0, plays: 0, cleared: 0 }, sent: false, m1try: 0, code: '', sentSig: '' });
 let state = fresh();
-try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.planets) state = Object.assign(fresh(), s); } catch (e) {}
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.planets) state = Object.assign(fresh(), s, { view: 'intro' }); } catch (e) {}
 const ui = { instr: null, photo: 0, fb: {}, sel: [], submitMsg: '', round: null, picked: null, shake: null, alg: null };
 let syncTimer = 0;
 function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} clearTimeout(syncTimer); syncTimer = setTimeout(sync, 1500); }
