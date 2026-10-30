@@ -174,7 +174,16 @@ label{display:block;font-weight:700;margin:12px 0 6px}
 .bin .chips{display:flex;flex-wrap:wrap;gap:8px}
 .pchip{display:flex;align-items:center;gap:6px;background:var(--chip);border:1.5px solid var(--line);border-radius:12px;padding:4px 10px 4px 4px}
 .pchip b{display:block;font-family:"Do Hyeon";font-weight:400;font-size:17px;line-height:1.1}
-.pchip small{display:block;color:var(--accent);font-size:12px;font-weight:700}
+.tstats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.tstats div{background:var(--chip);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--muted)}
+.tstats b{display:block;font-size:24px;color:var(--text)}
+.ttbl td{font-size:14px}
+.ttbl .tbad{color:var(--bad);font-weight:700}
+.ttbl .tok{color:var(--ok);font-weight:700}
+.ttbl details{font-size:12px;color:var(--muted);text-align:left;max-width:280px}
+.dtbl{margin-top:6px}
+.dtbl td:first-child{font-weight:700}
+.dtbl th small{font-size:11px}
 .pchip.wrong{border-color:var(--bad);box-shadow:0 0 0 2px var(--bad)}
 @media (max-width:600px){.bins{grid-template-columns:1fr}}
 .chip{display:inline-block;border-radius:6px;padding:1px 8px;font-size:13px}
@@ -651,71 +660,41 @@ const LQUIZ = [
   { q: '지구형 행성 4개를 모두 고르세요.', o: PLANETS.map(p => p.ko), a: [0, 1, 2, 3], multi: true }
 ];
 
-/* ───────── 복습 퀴즈 문제 은행 ───────── */
-const WHO = [
-  ['태양에서 가장 가깝고, 크기가 가장 작은 행성', 'mercury'],
-  ['대기가 거의 없어 낮과 밤의 온도 차이가 매우 큰 행성', 'mercury'],
-  ['표면에 운석 충돌구가 많아 달과 비슷하게 생긴 행성', 'mercury'],
-  ['크기와 질량이 지구와 가장 비슷한 행성', 'venus'],
-  ['이산화 탄소 대기의 온실 효과로 표면 온도가 가장 높은 행성', 'venus'],
-  ['샛별이라고 불리며, 지구에서 볼 때 가장 밝은 행성', 'venus'],
-  ['액체 상태의 물과 다양한 생명체가 있는 행성', 'earth'],
-  ['질소와 산소로 이루어진 대기가 있는 행성', 'earth'],
-  ['산화 철 때문에 표면이 붉게 보이는 행성', 'mars'],
-  ['극지방에 얼음과 드라이아이스로 된 흰 극관이 있는 행성', 'mars'],
-  ['태양계에서 가장 큰 화산, 올림포스 화산이 있는 행성', 'mars'],
-  ['울퉁불퉁한 위성 포보스와 데이모스를 가진 행성', 'mars'],
-  ['태양계에서 크기가 가장 큰 행성', 'jupiter'],
-  ['대기의 거대한 소용돌이인 대적점이 있는 행성', 'jupiter'],
-  ['갈릴레이가 발견한 4개의 위성을 가진 행성', 'jupiter'],
-  ['암석 조각과 얼음 알갱이로 된 뚜렷한 고리를 가진 행성', 'saturn'],
-  ['태양계에서 두 번째로 큰 행성', 'saturn'],
-  ['가장 큰 위성이 타이탄인 행성', 'saturn'],
-  ['아주 큰 욕조가 있다면 물에 뜰 만큼 가벼운 행성', 'saturn'],
-  ['자전축이 거의 누운 채로 자전하는 행성', 'uranus'],
-  ['위성 미란다를 가진 청록색 행성', 'uranus'],
-  ['태양계에서 가장 바깥쪽에 있는 행성', 'neptune'],
-  ['대기의 소용돌이인 검은 점, 대흑점이 나타나는 행성', 'neptune'],
-  ['가장 큰 위성이 트리톤인 행성', 'neptune']
+/* ───────── 복습 퀴즈: 모든 학생이 같은 15문제를 같은 순서로 풀어요 ───────── */
+// who: 나는 누구일까 · ox: O/X · why: 까닭 찾기 [정답, 오답 3개] · photo: 사진 · data: 탐사 자료 분석 · feat: 무리 나누기
+const QUIZ = [
+  { k: 'who', t: '대기가 거의 없어 낮과 밤의 온도 차이가 매우 큰 행성', id: 'mercury' },
+  { k: 'ox', t: '금성은 대기가 거의 없어서 표면 온도가 낮다.', v: false, ex: '금성은 두꺼운 이산화 탄소 대기의 온실 효과로 약 470℃예요.' },
+  { k: 'why', t: '수성은 태양에 가장 가깝지만, 표면 온도가 가장 높은 행성은 금성이에요. 그 까닭은?', ok: '금성의 두꺼운 이산화 탄소 대기가 온실 효과를 일으켜서', no: ['금성이 수성보다 태양에 더 가까워서', '금성 표면이 용암 바다로 덮여 있어서', '수성은 위성이 없어서 햇빛을 받지 못해서'], ex: '금성은 두꺼운 이산화 탄소 대기가 열을 가둬서 낮과 밤 모두 약 470℃예요.' },
+  { k: 'photo', img: 'neptune', id: 'neptune', ex: '보이저 2호가 찍은 해왕성이에요. 푸른색과 대기의 검은 소용돌이(대흑점)가 보여요.' },
+  { k: 'data', id: 'mars', t: '크기: 지구보다 작다 · 표면: 단단한 암석, 붉은색 · 극지방: 흰 극관 · 위성: 2개 · 고리: 없다' },
+  { k: 'feat', t: '자전 속도가 빠르다.', g: 1 },
+  { k: 'who', t: '대기의 거대한 소용돌이인 대적점이 있는 행성', id: 'jupiter' },
+  { k: 'why', t: '목성과 토성 표면에 적도와 나란한 줄무늬가 생기는 까닭은?', ok: '자전 속도가 빨라서', no: ['고리가 그림자를 만들어서', '표면에 강물이 흘러서', '운석 충돌구가 줄지어 있어서'], ex: '목성과 토성은 아주 빠르게 자전해서 대기가 띠 모양으로 흘러요.' },
+  { k: 'ox', t: '목성형 행성은 모두 고리를 가지고 있다.', v: true, ex: '목성, 토성, 천왕성, 해왕성 모두 고리가 있어요. (토성 고리가 가장 뚜렷해요)' },
+  { k: 'photo', img: 'mercury', id: 'mercury', ex: '메신저 탐사선이 찍은 수성이에요. 운석 충돌구가 많아 달과 비슷해 보여요.' },
+  { k: 'why', t: '화성에 계절이 있어서 극관의 크기가 달라지는 까닭은?', ok: '자전축이 기울어진 채 공전해서', no: ['위성이 2개라서', '표면에 산화 철이 많아서', '대기가 매우 두꺼워서'], ex: '지구처럼 자전축이 기울어져 있어서 계절이 생기고, 극관은 겨울에 커지고 여름에 작아져요.' },
+  { k: 'who', t: '자전축이 거의 누운 채로 자전하는 행성', id: 'uranus' },
+  { k: 'ox', t: '해왕성에는 대기의 소용돌이인 대흑점이 나타난다.', v: true, ex: '해왕성의 검은 점을 대흑점이라고 해요. (목성의 붉은 점은 대적점)' },
+  { k: 'data', id: 'saturn', t: '크기: 태양계에서 두 번째로 크다 · 표면: 기체 (단단한 표면 없음) · 위성: 많다 · 고리: 아주 뚜렷하다 · 자전: 빠르다' },
+  { k: 'why', t: '지구형 행성과 목성형 행성을 나누는 기준으로 알맞지 않은 것은?', ok: '평균 표면 온도가 0℃보다 높은지 낮은지', no: ['단단한 암석 표면이 있는지', '고리가 있는지', '질량이 지구보다 큰지'], ex: '지구(평균 15℃)와 화성(평균 -63℃)은 둘 다 지구형 행성인데, 온도는 0℃를 사이에 두고 갈려요. 그래서 온도는 두 무리를 나누는 기준이 될 수 없어요.' }
 ];
-const OX = [
-  ['금성이 밝게 보이는 까닭 중 하나는 황산 구름이 햇빛을 잘 반사하기 때문이다.', true, '황산 구름이 햇빛을 잘 반사하고, 지구에 가장 가까이 다가오기 때문에 밝게 보여요.'],
-  ['수성은 태양과 가까워서 밤에도 아주 뜨겁다.', false, '수성은 대기가 거의 없어 밤에는 약 -180℃까지 내려가요.'],
-  ['화성에는 위성이 없다.', false, '화성에는 포보스와 데이모스, 2개의 위성이 있어요.'],
-  ['목성형 행성은 모두 고리를 가지고 있다.', true, '목성, 토성, 천왕성, 해왕성 모두 고리가 있어요. (토성 고리가 가장 뚜렷해요)'],
-  ['지구형 행성은 단단한 암석 표면을 가지고 있다.', true, '수성, 금성, 지구, 화성은 모두 단단한 암석 표면이 있어요.'],
-  ['목성형 행성은 지구형 행성보다 크기가 작다.', false, '목성형 행성이 훨씬 커요. 가장 작은 목성형 행성인 해왕성도 지구 반지름의 약 4배예요.'],
-  ['천왕성은 자전축이 공전 궤도면과 거의 수직이다.', false, '천왕성은 자전축이 공전 궤도면과 거의 나란해서 누운 채로 자전해요.'],
-  ['화성의 극관은 여름에 커지고 겨울에 작아진다.', false, '극관은 겨울에 커지고 여름에 작아져요.'],
-  ['해왕성에는 대기의 소용돌이인 대흑점이 나타난다.', true, '해왕성의 검은 점을 대흑점이라고 해요.'],
-  ['목성의 줄무늬는 빠른 자전 때문에 생긴다.', true, '목성은 약 10시간 만에 한 바퀴 돌 만큼 빠르게 자전해요.'],
-  ['지구형 행성은 위성이 많다.', false, '지구형 행성은 위성이 없거나 적어요. (수성 0, 금성 0, 지구 1, 화성 2)'],
-  ['토성의 고리는 얼음 알갱이와 암석 조각으로 이루어져 있다.', true, '토성의 고리는 수많은 얼음 알갱이와 암석 조각이 모인 거예요.'],
-  ['금성은 대기가 거의 없어서 표면 온도가 낮다.', false, '금성은 두꺼운 이산화 탄소 대기의 온실 효과로 약 470℃예요.'],
-  ['목성형 행성은 주로 수소와 헬륨 같은 기체로 이루어져 있다.', true, '그래서 목성형 행성에는 단단한 표면이 없어요.'],
-  ['태양계에서 가장 큰 행성은 토성이다.', false, '가장 큰 행성은 목성이고, 토성은 두 번째로 커요.']
-];
-const FEAT = [
-  ['단단한 표면이 없고 기체로 이루어져 있다.', 1], ['크기와 질량이 작다.', 0], ['위성이 많다.', 1],
-  ['고리가 없다.', 0], ['태양에서 멀리 떨어져 있다.', 1], ['단단한 암석으로 이루어져 있다.', 0], ['자전 속도가 빠르다.', 1]
-];
-// 사진 퀴즈: 행성 전체 모습이나 뚜렷한 특징이 보이는 사진만 사용
-const PHOTOQ = [
-  ['mercury', 'mercury'], ['venus', 'venus'], ['earth', 'earth'], ['mars', 'mars'], ['jupiter', 'jupiter'], ['saturn', 'saturn'],
-  ['uranus', 'uranus'], ['neptune', 'neptune'], ['jupiter-grs', 'jupiter']
-];
-const MOONQ = [['phobos', 'mars', '포보스'], ['titan', 'saturn', '타이탄'], ['moon', 'earth', '달'], ['galilean', 'jupiter', '갈릴레이 위성']];
 
 /* ───────── 상태 ───────── */
 const KEY = 'planet-mission-v3';
-const fresh = () => ({ view: 'intro', num: '', name: '', cur: null, planets: {}, lab: { c: {}, concl: null, tbl: { placed: {}, miss: 0 }, quiz: {} }, game: { best: 0, bestRight: 0, plays: 0 }, alg: { wins: 0, plays: 0, cleared: 0 }, sent: false });
+const fresh = () => ({ view: 'intro', num: '', name: '', cur: null, planets: {}, lab: { c: {}, concl: null, tbl: { placed: {}, miss: 0 }, quiz: {} }, game: { best: 0, bestRight: 0, plays: 0 }, alg: { wins: 0, plays: 0, cleared: 0 }, sent: false, m1try: 0, code: '', sentSig: '' });
 let state = fresh();
 try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.planets) state = Object.assign(fresh(), s); } catch (e) {}
 const ui = { instr: null, photo: 0, fb: {}, sel: [], submitMsg: '', round: null, picked: null, shake: null, alg: null };
-function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+let syncTimer = 0;
+function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} clearTimeout(syncTimer); syncTimer = setTimeout(sync, 1500); }
 function ps(id) { return state.planets[id] || (state.planets[id] = { seen: [], q: {}, inq: null }); }
 function planetDone(id) { const s = state.planets[id]; return !!(s && s.inq && s.inq.ok); }
 function doneCount() { return PLANETS.filter(p => planetDone(p.id)).length; }
+// 임무 1 통과 기준: 보고서 빈칸 + 탐구 질문을 한 번에 맞힌 비율이 60% 이상
+const M1_PASS = 0.6;
+const m1Pct = () => { const sc = scoreInfo(); return Math.round(sc.ex / sc.exN * 100); };
+const m1Pass = () => doneCount() === 8 && m1Pct() >= M1_PASS * 100;
 const critOk = i => { const c = state.lab.c[CRIT[i].id]; return !!(c && c.ok); };
 const curCrit = () => CRIT.findIndex((_, i) => !critOk(i));
 const conclOk = () => !!(state.lab.concl && state.lab.concl.ok);
@@ -846,22 +825,24 @@ function viewIntro() {
 <div class="panel"><h3>대원 등록</h3>
 <label for="num">학번</label><input id="num" inputmode="numeric" maxlength="6" placeholder="예: 10312" value="${esc(state.num)}">
 <label for="name">이름</label><input id="name" maxlength="12" placeholder="예: 김하늘" value="${esc(state.name)}">
-<p class="note">입력한 학번과 이름은 이 기기와 선생님께만 전달돼요.</p>
+${CONFIG.SUBMIT_URL ? `<label for="ccode">수업 코드</label><input id="ccode" maxlength="20" placeholder="선생님이 알려 준 코드" autocomplete="off" value="${esc(state.code)}">` : ''}
+<p class="note">입력한 학번과 이름은 이 기기와 선생님께만 전달돼요.${CONFIG.SUBMIT_URL ? ' 임무를 마칠 때마다 진행 상황이 선생님께 자동으로 전달돼요.' : ''}</p>
 <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-act="start">${resume ? '이어서 탐사하기' : '탐사 시작!'}</button>${resume ? '<button class="btn ghost" data-act="reset">처음부터</button>' : ''}</div>
-<p class="fb bad" id="introMsg"></p></div></section>`;
+<p class="fb bad" id="introMsg"></p>
+${CONFIG.SUBMIT_URL ? '<div style="text-align:right;margin-top:10px"><button class="btn ghost small" data-act="teacher">👩‍🏫 교사용</button></div>' : ''}</div></section>`;
 }
 
 function viewMap() {
   const sizes = { mercury: 40, venus: 52, earth: 54, mars: 44, jupiter: 104, saturn: 112, uranus: 76, neptune: 72 };
-  const all = doneCount() === 8, ld = labDone(), played = state.game.plays > 0;
+  const all = m1Pass(), fail = doneCount() === 8 && !all, ld = all && labDone(), played = state.game.plays > 0;
   return topBar() + `<h2 class="pop">탐사할 행성을 고르세요</h2><p class="muted">순서는 자유예요. 태양에서 가까운 행성부터 가 보는 걸 추천해요.</p>
 <div class="system" role="list"><div class="sun"></div><span class="sun-label">☀ 태양</span>
 ${PLANETS.map(p => { const d = planetDone(p.id), st = state.planets[p.id];
     return `<button role="listitem" class="pl${d ? ' done' : ''}" data-act="go" data-id="${p.id}">${d ? '<span class="badge">🏅</span>' : ''}${planetSVG(p.id, sizes[p.id])}<span class="nm">${p.ko}</span><span class="st">${d ? '탐사 완료' : st ? '탐사 중' : '미탐사'}</span></button>`; }).join('')}
 </div><p class="map-note">※ 그림 속 행성의 크기와 거리는 실제 비율과 달라요. 실제 크기는 📏 측정기로 확인하세요.</p>
 <div class="stages">
-<div class="panel stage"><span class="n">임무 1</span><h3>🪐 행성 탐사</h3><p class="muted">${all ? '8개 행성 탐사 완료!' : `8개 행성을 모두 탐사하세요. (${doneCount()}/8)`}</p></div>
-<div class="panel stage"><span class="n">임무 2</span><h3>🔬 행성 분류 실험실</h3><p class="muted">${ld ? '분류 완료! 언제든 다시 복습할 수 있어요.' : all ? '여러 기준으로 행성을 나눠 보세요.' : '임무 1을 마치면 열려요.'}</p><div class="row"><button class="btn" data-act="lab" ${all ? '' : 'disabled'}>${ld ? '다시 보기' : '입장'}</button></div></div>
+<div class="panel stage"><span class="n">임무 1</span><h3>🪐 행성 탐사</h3><p class="muted">${all ? `8개 행성 탐사 통과! (한 번에 맞힌 비율 ${m1Pct()}%)` : fail ? `한 번에 맞힌 비율이 <b style="color:var(--bad)">${m1Pct()}%</b>예요. 60% 이상이어야 통과할 수 있어요.` : `8개 행성을 모두 탐사하세요. (${doneCount()}/8)<br><span style="font-size:13px">보고서와 탐구 질문을 한 번에 맞힌 비율이 60% 이상이어야 통과해요.</span>`}</p>${fail ? '<div class="row"><button class="btn" data-act="m1retry">🔁 임무 1 다시 풀기</button></div>' : ''}</div>
+<div class="panel stage"><span class="n">임무 2</span><h3>🔬 행성 분류 실험실</h3><p class="muted">${ld ? '분류 완료! 언제든 다시 복습할 수 있어요.' : all ? '여러 기준으로 행성을 나눠 보세요.' : '임무 1을 통과하면 열려요.'}</p><div class="row"><button class="btn" data-act="lab" ${all ? '' : 'disabled'}>${ld ? '다시 보기' : '입장'}</button></div></div>
 <div class="panel stage"><span class="n">임무 3</span><h3>🎮 복습 퀴즈 대모험</h3><p class="muted">${ld ? (played ? `최고 기록 ${state.game.best}점` : '배운 내용을 퀴즈로 복습해요.') : '임무 2를 마치면 열려요.'}</p><div class="row"><button class="btn" data-act="game" ${ld ? '' : 'disabled'}>도전!</button>${played ? '<button class="btn ghost small" data-act="cert">🎖 인증서</button>' : ''}</div></div>
 <div class="panel stage"><span class="n">보너스</span><h3>🎯 행성 알까기</h3><p class="muted">${played ? `지구형 팀 vs 목성형 팀! 3단계 도전 (${Math.min(algCleared(), 3)}/3 클리어)` : '임무 3을 한 번 하면 열려요.'}</p><div class="row"><button class="btn" data-act="alg" ${played ? '' : 'disabled'}>놀기</button></div></div>
 </div>
@@ -878,14 +859,14 @@ function viewPlanet() {
     const blank = r.ok ? `<span class="blank ok">${q.a}</span>` : '<span class="blank">?</span>';
     const fb = ui.fb[p.id + i];
     return `<div class="q"><div class="s">${i + 1}. ${parts[0]}${blank}${parts[1] || ''}</div>
-${r.ok ? '' : `<div class="opts">${shuffled(q.o, q.t).map(o => `<button class="opt${(r.no || []).includes(o) ? ' no' : ''}" data-act="ans" data-i="${i}" data-o="${esc(o)}">${o}</button>`).join('')}</div>`}
+${r.ok ? '' : `<div class="opts">${shuffled(q.o, q.t + state.m1try).map(o => `<button class="opt${(r.no || []).includes(o) ? ' no' : ''}" data-act="ans" data-i="${i}" data-o="${esc(o)}">${o}</button>`).join('')}</div>`}
 ${fb ? `<div class="fb ${fb.ok ? 'ok' : 'bad'}">${fb.msg}</div>` : ''}</div>`;
   }).join('');
   const iq = p.inq, ir = s.inq || {};
   const inq = !allQ ? '' : `<div class="inq"><div class="lbl">🤔 탐구 질문</div><p style="font-size:17px;margin-top:4px">${iq.q}</p>
-${ir.ok ? `<p class="fb ok">✔ ${iq.o[iq.a]}</p><div class="explain">${iq.ex}</div>` : `<div class="opts">${iq.o.map((o, j) => `<button class="opt${(ir.no || []).includes(j) ? ' no' : ''}" data-act="inq" data-j="${j}">${o}</button>`).join('')}</div>${ui.fb[p.id + 'inq'] ? `<div class="fb bad">${ui.fb[p.id + 'inq']}</div>` : ''}`}</div>`;
+${ir.ok ? `<p class="fb ok">✔ ${iq.o[iq.a]}</p><div class="explain">${iq.ex}</div>` : `<div class="opts">${shuffled(iq.o.map((_, j) => j), p.id + state.m1try).map(j => `<button class="opt${(ir.no || []).includes(j) ? ' no' : ''}" data-act="inq" data-j="${j}">${iq.o[j]}</button>`).join('')}</div>${ui.fb[p.id + 'inq'] ? `<div class="fb bad">${ui.fb[p.id + 'inq']}</div>` : ''}`}</div>`;
   const done = ir.ok ? `<div class="done-box"><div class="title">🏅 ${p.ko} 탐사 완료!</div><p>보고서 내용을 학습지에도 옮겨 적어 보세요.</p>
-<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px">${next ? `<button class="btn" data-act="go" data-id="${next.id}">다음 탐사: ${next.ko} →</button>` : '<button class="btn" data-act="lab">🔬 분류 실험실로 →</button>'}<button class="btn ghost" data-act="map">지도로</button></div></div>` : '';
+<div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:8px">${next ? `<button class="btn" data-act="go" data-id="${next.id}">다음 탐사: ${next.ko} →</button>` : m1Pass() ? '<button class="btn" data-act="lab">🔬 분류 실험실로 →</button>' : `<p style="width:100%">8개 행성 중 한 번에 맞힌 비율이 <b style="color:var(--bad)">${m1Pct()}%</b>예요. 60% 이상이어야 임무 2로 갈 수 있어요.</p><button class="btn" data-act="m1retry">🔁 임무 1 다시 풀기</button>`}<button class="btn ghost" data-act="map">지도로</button></div></div>` : '';
   return topBar(backBtn) + `<div class="pgrid pop">
 <section class="panel"><div class="hero">${planetSVG(p.id, 120)}<div><h2>${p.ko} <span class="en">${p.en}</span></h2><p class="muted">태양에서 ${p.order}번째 행성</p></div></div>
 <div class="instr">${Object.entries(INSTR).map(([key, v]) => `<button class="${k === key ? 'on ' : ''}${s.seen.includes(key) ? 'seen' : ''}" data-act="instr" data-k="${key}" aria-pressed="${k === key}"><span class="ic">${v.ic}</span>${v.name}</button>`).join('')}</div>
@@ -901,9 +882,14 @@ ${r.ok ? '' : q.multi
 ${r.msg ? `<div class="fb bad">${r.msg}</div>` : ''}</div>`;
 }
 
-function pchip(p, c, wrong) {
+// 행성 카드에는 이름만 보여 주고, 값은 위의 탐사 자료 표에서 직접 찾게 해요
+function pchip(p, wrong) {
   const pk = ui.picked && ui.picked.kind === 'crit' && ui.picked.id === p.id;
-  return `<div class="pchip${wrong ? ' wrong' : ''}${pk ? ' picked' : ''}${ui.shake === p.id ? ' shake' : ''}" data-drag="${p.id}" data-kind="crit">${planetSVG(p.id, 36)}<span><b>${p.ko}</b><small>${c.val(p)}</small></span></div>`;
+  return `<div class="pchip${wrong ? ' wrong' : ''}${pk ? ' picked' : ''}${ui.shake === p.id ? ' shake' : ''}" data-drag="${p.id}" data-kind="crit">${planetSVG(p.id, 36)}<span><b>${p.ko}</b></span></div>`;
+}
+function dataTable() {
+  return `<div class="tbl-wrap"><table class="dtbl"><thead><tr><th>행성</th><th>반지름<br><small>(지구 = 1)</small></th><th>질량<br><small>(지구 = 1)</small></th><th>위성 수</th><th>고리</th><th>표면</th></tr></thead><tbody>
+${PLANETS.map(p => `<tr><td>${p.ko}</td><td>${p.d}</td><td>${p.m}</td><td>${p.moons}</td><td>${p.ring}</td><td>${p.surface.replace(' (단단한 표면 없음)', '')}</td></tr>`).join('')}</tbody></table></div>`;
 }
 
 function viewLab() {
@@ -914,13 +900,14 @@ function viewLab() {
   if (cur !== -1) {
     const c = CRIT[cur], st = L.c[c.id] || { g: {} }, wrong = (ui.fb.crit && ui.fb.crit.id === c.id) ? ui.fb.crit.wrong : [];
     const pool = PLANETS.filter(p => st.g[p.id] === undefined);
-    const bin = j => `<div class="bin b${j}" data-drop="${j}" data-act="zone"><div class="bh">${c.bins[j]}</div><div class="chips">${PLANETS.filter(p => st.g[p.id] === j).map(p => pchip(p, c, wrong.includes(p.id))).join('')}</div></div>`;
-    body = `<section class="panel"><p class="muted" style="margin:0">기준 ${cur + 1} / ${CRIT.length}</p><h3>${c.by} 나누기</h3><p>${c.ask}</p>
-<p class="note">행성 카드를 끌어서 알맞은 칸에 놓으세요. 카드를 누른 다음 칸을 눌러도 돼요.</p>
-<div class="pool" data-drop="pool" data-act="zone">${pool.length ? pool.map(p => pchip(p, c, false)).join('') : '<span class="empty">모든 행성을 나눴어요! 확인해 보세요.</span>'}</div>
+    const bin = j => `<div class="bin b${j}" data-drop="${j}" data-act="zone"><div class="bh">${c.bins[j]}</div><div class="chips">${PLANETS.filter(p => st.g[p.id] === j).map(p => pchip(p, wrong.includes(p.id))).join('')}</div></div>`;
+    body = `<section class="panel"><h3>📡 행성 탐사 자료</h3><p class="muted" style="font-size:14px;margin:0">아래 표에서 필요한 값을 직접 찾아 행성을 나눠 보세요.</p>${dataTable()}</section>
+<section class="panel" style="margin-top:14px"><p class="muted" style="margin:0">기준 ${cur + 1} / ${CRIT.length}</p><h3>${c.by} 나누기</h3><p>${c.ask}</p>
+<p class="note">위 표에서 <b>${c.title}</b> 값을 찾아보고, 행성 카드를 끌어서 알맞은 칸에 놓으세요. 카드를 누른 다음 칸을 눌러도 돼요.</p>
+<div class="pool" data-drop="pool" data-act="zone">${pool.length ? pool.map(p => pchip(p, false)).join('') : '<span class="empty">모든 행성을 나눴어요! 확인해 보세요.</span>'}</div>
 <div class="bins">${bin(0)}${bin(1)}</div>
 <div class="row" style="margin-top:12px"><button class="btn" data-act="ccheck" ${pool.length ? 'disabled' : ''}>확인하기</button><span class="muted" style="font-size:14px">${pool.length ? `아직 ${pool.length}개 남았어요.` : ''}</span></div>
-${wrong.length ? `<p class="fb bad">🔎 ${wrong.length}개 행성이 다른 칸에 있어요. 빨간 테두리 카드의 값을 다시 확인해 보세요.</p>` : ''}</section>`;
+${wrong.length ? `<p class="fb bad">🔎 ${wrong.length}개 행성이 다른 칸에 있어요. 빨간 테두리 행성의 값을 위 표에서 다시 찾아보세요.</p>` : ''}</section>`;
   } else {
     const matrix = `<div class="tbl-wrap"><table><thead><tr><th>행성</th>${CRIT.map(c => `<th>${c.title}</th>`).join('')}</tr></thead><tbody>
 ${PLANETS.map(p => `<tr><td>${p.ko}</td>${CRIT.map(c => { const g = c.g(p); return `<td><span class="chip g${g}">${c.bins[g]}</span></td>`; }).join('')}</tr>`).join('')}</tbody></table></div>`;
@@ -966,14 +953,19 @@ ${TBL.map((r, i) => `<tr><td>${r[0]}</td>${cell(i, 0)}${cell(i, 1)}</tr>`).join(
 /* ───────── 복습 퀴즈 대모험 ───────── */
 function buildRound() {
   const qs = [];
-  const fourPlanets = id => rshuffle([id].concat(rshuffle(PLANETS.map(p => p.id).filter(x => x !== id)).slice(0, 3)));
-  rshuffle(WHO).slice(0, 5).forEach(([t, id]) => { const o = fourPlanets(id); qs.push({ type: '🔍 나는 누구일까?', q: `"${t}" — 나는 누구일까요?`, o: o.map(x => ({ id: x, t: P[x].ko })), a: o.indexOf(id), ex: `정답은 ${P[id].ko}이에요.` }); });
-  rshuffle(OX).slice(0, 4).forEach(([t, v, ex]) => qs.push({ type: '⭕ O / X', q: t, o: [{ t: '⭕ 맞다' }, { t: '❌ 틀리다' }], a: v ? 0 : 1, ex }));
-  rshuffle(PLANETS).slice(0, 2).forEach(p => qs.push({ type: '🪐 무리 나누기', q: `${josa(p.ko, '은', '는')} 지구형 행성일까요, 목성형 행성일까요?`, o: GROUPS.map(t => ({ t })), a: isT(p.id) ? 0 : 1, ex: `${josa(p.ko, '은', '는')} ${GROUPS[isT(p.id) ? 0 : 1]}이에요.` }));
-  rshuffle(FEAT).slice(0, 1).forEach(([t, g]) => qs.push({ type: '🪐 무리 나누기', q: `"${t}" — 어느 무리의 특징일까요?`, o: GROUPS.map(t => ({ t })), a: g, ex: `${GROUPS[g]}의 특징이에요.` }));
-  rshuffle(PHOTOQ).slice(0, 2).forEach(([k, id]) => { const o = fourPlanets(id); qs.push({ type: '📷 사진 퀴즈', img: k, q: '이 사진은 어느 행성일까요?', o: o.map(x => ({ id: x, t: P[x].ko })), a: o.indexOf(id), ex: `${P[id].ko}의 사진이에요.` }); });
-  rshuffle(MOONQ).slice(0, 1).forEach(([k, id, nm]) => { const o = fourPlanets(id); qs.push({ type: '🛰️ 위성 사진 퀴즈', img: k, q: '이 위성은 어느 행성의 위성일까요?', o: o.map(x => ({ id: x, t: P[x].ko })), a: o.indexOf(id), ex: `${josa(nm, '은', '는')} ${P[id].ko}의 위성이에요.` }); });
-  return { qs: rshuffle(qs), i: 0, score: 0, combo: 0, maxCombo: 0, right: 0, picked: null };
+  // 보기는 정답과 같은 무리의 행성 4개로 만들어서, 무리만 알아서는 맞힐 수 없게 해요
+  const sameGroup = (id, seed) => shuffled(isT(id) ? TERRA : JOVI, seed);
+  QUIZ.forEach((x, n) => {
+    const seed = 'quiz' + n;
+    const pick = (id, type, q, ex, img) => { const o = sameGroup(id, seed); qs.push({ type, q, img, o: o.map(y => ({ id: y, t: P[y].ko })), a: o.indexOf(id), ex }); };
+    if (x.k === 'who') pick(x.id, '🔍 나는 누구일까?', `"${x.t}" — 나는 누구일까요?`, `정답은 ${P[x.id].ko}이에요.`);
+    else if (x.k === 'photo') pick(x.id, '📷 사진 퀴즈', '이 사진은 어느 행성일까요?', x.ex, x.img);
+    else if (x.k === 'data') pick(x.id, '📡 탐사 자료 분석', `탐사선이 보내온 자료예요. 어느 행성일까요?<br><span class="muted" style="font-size:15px">${x.t}</span>`, `${P[x.id].ko}의 자료예요.`);
+    else if (x.k === 'ox') qs.push({ type: '⭕ O / X', q: x.t, o: [{ t: '⭕ 맞다' }, { t: '❌ 틀리다' }], a: x.v ? 0 : 1, ex: x.ex });
+    else if (x.k === 'why') { const o = shuffled([x.ok].concat(x.no), seed); qs.push({ type: '🤔 까닭 찾기', q: x.t, o: o.map(y => ({ t: y })), a: o.indexOf(x.ok), ex: x.ex }); }
+    else if (x.k === 'feat') qs.push({ type: '🪐 무리 나누기', q: `"${x.t}" — 어느 무리의 특징일까요?`, o: GROUPS.map(t => ({ t })), a: x.g, ex: `${GROUPS[x.g]}의 특징이에요.` });
+  });
+  return { qs, i: 0, score: 0, combo: 0, maxCombo: 0, right: 0, picked: null };
 }
 function viewGame() {
   const R = ui.round;
@@ -983,8 +975,8 @@ function viewGame() {
 <div class="stars">${'⭐'.repeat(stars)}${'☆'.repeat(3 - stars)}</div>
 <p class="big" style="font-size:48px">${R.score}점</p><p>${n}문제 중 <b>${R.right}개</b> 정답 · 최대 연속 정답 <b>${R.maxCombo}</b>번</p>
 <p class="muted">최고 기록: ${state.game.best}점${R.score >= state.game.best && R.score > 0 ? ' 🎉 신기록!' : ''}</p>
-<div class="row" style="justify-content:center;margin-top:14px"><button class="btn" data-act="game">🔁 새 문제로 다시 도전</button><button class="btn ghost" data-act="cert">🎖 인증서 받기</button><button class="btn ghost" data-act="alg">🎯 행성 알까기</button></div>
-<p class="note">도전할 때마다 문제가 새로 섞여 나와요.</p></div>`;
+<div class="row" style="justify-content:center;margin-top:14px"><button class="btn" data-act="game">🔁 다시 도전</button><button class="btn ghost" data-act="cert">🎖 인증서 받기</button><button class="btn ghost" data-act="alg">🎯 행성 알까기</button></div>
+<p class="note">모든 대원이 같은 문제를 풀어요. 다시 도전해서 기록을 올려 보세요.</p></div>`;
   }
   const q = R.qs[R.i], pk = R.picked;
   const opts = q.o.map((o, j) => {
@@ -1362,7 +1354,8 @@ function viewCert() {
   const sc = scoreInfo(), G = state.game;
   const date = new Date().toLocaleDateString('ko-KR');
   const sub = CONFIG.SUBMIT_URL ? `<div class="panel submit noprint"><h3>📤 선생님께 제출하기</h3>
-${state.sent ? '<p class="fb ok">✔ 제출 완료! 수고했어요. (퀴즈 기록을 더 올렸다면 다시 제출해도 돼요)</p>' : '<p class="muted">선생님이 알려준 수업 코드를 입력하고 제출하세요.</p>'}<div class="row"><input id="code" placeholder="수업 코드" maxlength="20"><button class="btn" data-act="submit">제출</button></div>
+${state.code ? `<p class="muted">임무를 마칠 때마다 결과가 선생님께 자동으로 전달돼요. 확실히 하고 싶으면 아래 버튼을 한 번 더 눌러 주세요.</p><div class="row"><button class="btn" data-act="submit">📤 지금 결과 보내기</button></div>`
+    : '<p class="muted">선생님이 알려준 수업 코드를 입력하고 제출하세요.</p><div class="row"><input id="code" placeholder="수업 코드" maxlength="20"><button class="btn" data-act="submit">제출</button></div>'}
 ${ui.submitMsg ? `<p class="fb ${state.sent ? 'ok' : 'bad'}">${ui.submitMsg}</p>` : ''}</div>`
     : `<div class="panel submit noprint"><p>📸 <b>이 인증서 화면을 캡처해서</b> 선생님이 알려준 곳에 제출하세요.</p></div>`;
   return topBar(backBtn) + `<div class="cert pop"><div class="head">
@@ -1375,13 +1368,66 @@ ${ui.submitMsg ? `<p class="fb ${state.sent ? 'ok' : 'bad'}">${ui.submitMsg}</p>
 <p class="note noprint" style="text-align:center">여러 학생이 함께 쓰는 기기라면, 제출을 마친 뒤 기록을 지워 주세요.</p>`;
 }
 
+/* ───────── 교사 화면 ─────────
+   교사 코드는 이 파일에 없고 Apps Script에서만 확인해요. 코드가 맞으면 시트의 제출 결과를 받아 와요. */
+function viewTeacher() {
+  const T = ui.teacher || (ui.teacher = { rows: null, code: '', msg: '', detail: false, cls: '' });
+  const head = `<div class="top"><span class="title" style="font-size:24px">👩‍🏫 교사 화면</span><span class="grow"></span>${T.rows ? '<button class="btn ghost small" data-act="tload">🔄 새로고침</button>' : ''}<button class="btn ghost small" data-act="tout">← 처음 화면</button></div>`;
+  if (!T.rows) return head + `<section class="panel pop" style="max-width:440px"><h3>교사 코드 입력</h3>
+<div class="row"><input id="tcode" type="password" maxlength="30" placeholder="교사 코드" autocomplete="off"><button class="btn" data-act="tload">결과 보기</button></div>
+${T.msg ? `<p class="fb ${T.msg.startsWith('불러') ? '' : 'bad'}">${T.msg}</p>` : ''}</section>`;
+  const pct = s => { const [a, b] = String(s).split('/').map(Number); return b ? Math.round(a / b * 100) : 0; };
+  const cls = r => r.num.length > 2 ? r.num.slice(0, -2) : '';
+  const clsName = c => c.length === 3 ? `${c[0]}학년 ${+c.slice(1)}반` : c;
+  const m1ok = r => r.m1pass === 'O', m2ok = r => r.m2 === 'O', m3ok = r => +r.gamePlays > 0;
+  const m1cell = r => m1ok(r) ? '<span class="tok">✔ 통과</span>' : r.m1 === '8/8' ? '<span class="tbad">✖ 다시 푸는 중</span>' : `<span class="muted">진행 중 ${esc(r.m1)}</span>`;
+  const mark = ok => ok ? '<span class="tok">✔</span>' : '<span class="muted">–</span>';
+  const classes = [...new Set(T.rows.map(cls))].filter(Boolean).sort((a, b) => a.localeCompare(b, 'ko', { numeric: true }));
+  const rows = T.rows.filter(r => !T.cls || cls(r) === T.cls).sort((a, b) => a.num.localeCompare(b.num, 'ko', { numeric: true }));
+  const count = f => rows.filter(f).length;
+  // 평균은 그 임무를 마친 학생만 모아서 내요
+  const avgOf = (list, f) => list.length ? Math.round(list.reduce((s, r) => s + f(r), 0) / list.length) : 0;
+  const exAvg = avgOf(rows.filter(r => r.m1 === '8/8'), r => pct(r.explore)), labAvg = avgOf(rows.filter(m2ok), r => pct(r.lab)), quizAvg = avgOf(rows.filter(m3ok), r => +r.gameBest || 0);
+  const D = T.detail;
+  const stats = D
+    ? `<div>행성 탐사 평균<b>${exAvg}%</b>한 번에 맞힌 비율</div><div>분류 실험실 평균<b>${labAvg}%</b>한 번에 맞힌 비율</div><div>퀴즈 최고 점수 평균<b>${quizAvg}점</b>퀴즈를 푼 학생 기준</div><div>임무 1 다시 푼 학생<b>${count(r => +r.m1try > 1)}명</b></div>`
+    : `<div>참여 학생<b>${rows.length}명</b></div><div>임무 1 통과<b>${count(m1ok)}명</b></div><div>임무 2 완료<b>${count(m2ok)}명</b></div><div>임무 3 완료<b>${count(m3ok)}명</b></div>`;
+  const th = D
+    ? '<th>학번</th><th>이름</th><th>행성 탐사<br><small>한 번에 맞힌 수</small></th><th>임무 1<br><small>도전 횟수</small></th><th>분류 실험실<br><small>한 번에 맞힌 수</small></th><th>퀴즈 최고</th><th>퀴즈<br><small>도전 횟수</small></th><th>보너스</th><th>자세히</th>'
+    : '<th>학번</th><th>이름</th><th>임무 1<br><small>행성 탐사</small></th><th>임무 2<br><small>분류 실험실</small></th><th>임무 3<br><small>복습 퀴즈</small></th><th>보너스<br><small>알까기 단계</small></th><th>마지막 활동</th>';
+  const td = r => D
+    ? `<td>${esc(r.num)}</td><td>${esc(r.name)}</td><td>${esc(r.explore)} <span class="muted">(${pct(r.explore)}%)</span></td><td${+r.m1try > 1 ? ' class="tbad"' : ''}>${esc(r.m1try)}번</td><td>${m2ok(r) ? `${esc(r.lab)} <span class="muted">(${pct(r.lab)}%)</span>` : '<span class="muted">–</span>'}</td><td>${m3ok(r) ? `${esc(r.gameBest)}점 <span class="muted">(${esc(r.gameRight)})</span>` : '<span class="muted">–</span>'}</td><td>${esc(r.gamePlays)}회</td><td>${esc(r.bonus)}/3</td>
+<td><details><summary>보기</summary><p><b>행성별</b> ${esc(r.planets)}</p><p><b>분류 시도</b> ${esc(r.critTries)}</p></details></td>`
+    : `<td>${esc(r.num)}</td><td>${esc(r.name)}</td><td>${m1cell(r)}</td><td>${mark(m2ok(r))}</td><td>${mark(m3ok(r))}</td><td>${+r.bonus ? `${esc(r.bonus)}/3` : '<span class="muted">–</span>'}</td><td style="font-size:12px">${esc(r.time)}</td>`;
+  return head + `<div class="pop"><div class="row">
+<button class="btn small${T.cls ? ' ghost' : ''}" data-act="tcls" data-c="">전체</button>${classes.map(c => `<button class="btn small${T.cls === c ? '' : ' ghost'}" data-act="tcls" data-c="${esc(c)}">${clsName(c)}</button>`).join('')}
+<span class="grow"></span><button class="btn small" data-act="tdetail">${D ? '✅ 진행 상황 보기' : '📊 세부 성적 보기'}</button></div>
+<div class="tstats">${stats}</div>
+<section class="panel"><div class="tbl-wrap"><table class="ttbl"><thead><tr>${th}</tr></thead><tbody>
+${rows.length ? rows.map(r => `<tr>${td(r)}</tr>`).join('') : `<tr><td colspan="9" style="text-align:center" class="muted">아직 참여한 학생이 없어요.</td></tr>`}
+</tbody></table></div><p class="note">${D ? '"한 번에 맞힌 수"는 처음 고른 답이 정답이었던 문제 수예요. 임무 1을 다시 푼 학생은 도전 횟수가 빨간색으로 보여요.' : '학생이 임무를 마칠 때마다 자동으로 바뀌어요. 최신 상태는 🔄 새로고침을 누르세요.'} 학번 앞 3자리로 반을 나눠요. (예: 10312 → 1학년 3반)</p></section></div>`;
+}
+async function teacherLoad() {
+  const T = ui.teacher, inp = document.getElementById('tcode');
+  if (inp) T.code = inp.value.trim();
+  if (!T.code) { T.msg = '교사 코드를 입력해 주세요.'; render(); return; }
+  T.msg = '불러오는 중…'; render();
+  try {
+    const out = await post({ action: 'list', teacher: T.code });
+    if (out.ok) { T.rows = out.rows; T.msg = ''; }
+    else { T.rows = null; T.msg = out.error === 'teacher' ? '교사 코드가 맞지 않아요.' : out.error === 'code' ? 'Apps Script가 아직 예전 버전이에요. 새 코드를 붙여 넣고 새 버전으로 배포해 주세요.' : '결과를 불러오지 못했어요.'; }
+  } catch (err) { T.rows = null; T.msg = '인터넷 연결을 확인해 주세요.'; }
+  render();
+}
+
 /* ───────── 그리기 ───────── */
 let lastKey = '';
 function render() {
+  if ((state.view === 'lab' || state.view === 'game') && !m1Pass()) state.view = 'map';
   const v = state.view;
   const key = v + '|' + (state.cur || '') + '|' + (v === 'game' && ui.round ? ui.round.i : '') + '|' + (v === 'alg' ? (ui.alg ? ui.alg.phase : '') : '');
   app.classList.toggle('still', key === lastKey); lastKey = key;
-  app.innerHTML = v === 'map' ? viewMap() : v === 'planet' ? viewPlanet() : v === 'lab' ? viewLab() : v === 'game' && ui.round ? viewGame() : v === 'cert' ? viewCert() : v === 'alg' ? viewAlg() : v === 'game' ? viewMap() : viewIntro();
+  app.innerHTML = v === 'map' ? viewMap() : v === 'planet' ? viewPlanet() : v === 'lab' ? viewLab() : v === 'game' && ui.round ? viewGame() : v === 'cert' ? viewCert() : v === 'alg' ? viewAlg() : v === 'teacher' ? viewTeacher() : v === 'game' ? viewMap() : viewIntro();
   ui.shake = null;
   if (v === 'alg') algMount();
 }
@@ -1438,14 +1484,25 @@ document.addEventListener('pointercancel', e => endDrag(e, true));
 
 /* ───────── 동작 ───────── */
 function answer(r, ok, j) { if (ok) r.ok = true; else (r.no || (r.no = [])).push(j); }
-app.addEventListener('click', e => {
+app.addEventListener('click', async e => {
   if (e.target.closest('[data-drag]')) return;
   const t = e.target.closest('[data-act]'); if (!t || t.disabled) return;
   const a = t.dataset.act;
   if (a === 'zone') { if (ui.picked) dropTo(ui.picked.kind, ui.picked.id, t.dataset.drop); }
   else if (a === 'start') {
     const num = document.getElementById('num').value.trim(), name = document.getElementById('name').value.trim();
-    if (!num || !name) { document.getElementById('introMsg').textContent = '학번과 이름을 모두 입력해 주세요.'; return; }
+    const msg = document.getElementById('introMsg');
+    if (!num || !name) { msg.textContent = '학번과 이름을 모두 입력해 주세요.'; return; }
+    if (CONFIG.SUBMIT_URL) {
+      const code = document.getElementById('ccode').value.trim();
+      if (!code) { msg.textContent = '수업 코드도 입력해 주세요.'; return; }
+      msg.textContent = '수업 코드를 확인하는 중…'; t.disabled = true;
+      try {
+        const out = await post({ action: 'check', code });
+        if (!out.ok) { msg.textContent = '수업 코드가 맞지 않아요. 다시 확인해 주세요.'; t.disabled = false; return; }
+      } catch (err) { /* 인터넷이 잠시 안 되면 일단 시작하고, 나중에 다시 보내요 */ }
+      state.code = code;
+    }
     state.num = num; state.name = name;
     // 선생님 시험용: 학번 00000 으로 들어오면 바로 인증서(제출) 화면으로 이동
     if (num === '00000') { ui.submitMsg = '🧪 선생님 시험 모드예요. 수업 코드를 넣고 제출해서 구글 시트에 줄이 생기는지 확인하세요.'; go('cert'); return; }
@@ -1473,7 +1530,12 @@ app.addEventListener('click', e => {
     answer(r, j === p.inq.a, j);
     ui.fb[p.id + 'inq'] = r.ok ? '' : '🤔 아쉬워요. 모은 증거를 떠올리며 다시 골라 보세요.';
     save(); render();
-  } else if (a === 'lab') { ui.fb = {}; go('lab'); }
+  } else if (a === 'lab') { ui.fb = {}; go(m1Pass() ? 'lab' : 'map'); }
+  else if (a === 'm1retry') {
+    if (confirm('임무 1을 처음부터 다시 풀어요. 행성 탐사 기록이 지워지고, 보기 순서도 바뀌어요. 계속할까요?')) {
+      state.planets = {}; state.m1try++; ui.fb = {}; go('map');
+    }
+  }
   else if (a === 'ccheck') {
     const c = CRIT[curCrit()], st = state.lab.c[c.id];
     st.tries++;
@@ -1526,32 +1588,52 @@ app.addEventListener('click', e => {
     ui.alg = o.rule === 'classic' ? algNew(o.mode, o.human, lv, 'classic') : draftNew(o.mode, lv);
     lastKey = ''; render(); window.scrollTo(0, 0);
   }
+  else if (a === 'teacher') { ui.teacher = null; go('teacher'); }
+  else if (a === 'tload') teacherLoad();
+  else if (a === 'tcls') { ui.teacher.cls = t.dataset.c; render(); }
+  else if (a === 'tdetail') { ui.teacher.detail = !ui.teacher.detail; render(); }
+  else if (a === 'tout') { ui.teacher = null; go('intro'); }
   else if (a === 'cert') go('cert');
   else if (a === 'print') window.print();
   else if (a === 'submit') submit();
 });
 
-async function submit() {
-  const code = (document.getElementById('code') || {}).value || '';
-  if (!code.trim()) { ui.submitMsg = '수업 코드를 입력해 주세요.'; render(); return; }
+/* ───────── 선생님께 진행 상황 보내기 ─────────
+   임무 진행 상태가 바뀔 때마다 자동으로 보내요. 시트에는 학생 한 명당 한 줄로 저장돼요. */
+async function post(body) {
+  const res = await fetch(CONFIG.SUBMIT_URL, { method: 'POST', body: JSON.stringify(body) });
+  return res.json();
+}
+function progress() {
   const sc = scoreInfo(), G = state.game;
-  const payload = {
-    code: code.trim(), num: state.num, name: state.name,
+  return {
+    code: state.code, num: state.num, name: state.name,
+    m1: `${doneCount()}/8`, m1pass: m1Pass(), m1try: state.m1try + 1, m2: m1Pass() && labDone(), bonus: Math.min(algCleared(), 3),
     explore: `${sc.ex}/${sc.exN}`, lab: `${sc.lab}/${sc.labN}`,
     gameBest: G.best, gameRight: `${G.bestRight}/15`, gamePlays: G.plays,
     planets: sc.per.map(x => `${x.p.ko} ${x.f}/${x.n}`).join(', '),
     critTries: CRIT.map(c => `${c.title} ${(state.lab.c[c.id] || {}).tries || 0}회`).join(', ') + `, 표 완성 실수 ${state.lab.tbl.miss}회`
   };
-  ui.submitMsg = '전송 중…'; render();
+}
+async function sync(force) {
+  if (!CONFIG.SUBMIT_URL || !state.code || !state.num) return null;
+  const p = progress(), sig = [p.num, p.name, p.m1, p.m1pass, p.m1try, p.m2, p.gamePlays, p.gameBest, p.bonus].join('|');
+  if (!force && sig === state.sentSig) return null;
   try {
-    const res = await fetch(CONFIG.SUBMIT_URL, { method: 'POST', body: JSON.stringify(payload) });
-    const out = await res.json();
-    if (out.ok) { state.sent = true; ui.submitMsg = '✔ 제출되었어요.'; save(); }
-    else ui.submitMsg = out.error === 'code' ? '수업 코드가 맞지 않아요. 다시 확인해 주세요.' : '제출에 실패했어요. 인증서를 캡처해서 제출하세요.';
-  } catch (err) {
-    ui.submitMsg = '인터넷 연결을 확인해 주세요. 계속 안 되면 인증서를 캡처해서 제출하세요.';
-  }
-  render();
+    const out = await post(p);
+    if (out.ok) { state.sentSig = sig; state.sent = true; try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+    return out;
+  } catch (err) { return { ok: false, error: 'net' }; }
+}
+async function submit() {
+  const inp = document.getElementById('code');
+  if (inp) { if (!inp.value.trim()) { ui.submitMsg = '수업 코드를 입력해 주세요.'; render(); return; } state.code = inp.value.trim(); }
+  ui.submitMsg = '전송 중…'; render();
+  const out = await sync(true);
+  if (out && out.ok) ui.submitMsg = '✔ 선생님께 보냈어요.';
+  else if (out && out.error === 'code') { state.code = ''; ui.submitMsg = '수업 코드가 맞지 않아요. 다시 확인해 주세요.'; }
+  else ui.submitMsg = '인터넷 연결을 확인해 주세요. 계속 안 되면 인증서를 캡처해서 제출하세요.';
+  save(); render();
 }
 
 /* ───────── 별 배경 ───────── */
