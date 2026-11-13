@@ -11,19 +11,23 @@
 :root{--bg:#0b1020;--card:#151c33;--line:#2a3558;--ink:#f3f5ff;--muted:#a9b3d6;--gold:#ffcf5a;--green:#3dff8f}
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(ellipse at 50% -20%,#1d2a55 0%,var(--bg) 60%);background-color:var(--bg);color:var(--ink);font-family:'Noto Sans KR',system-ui,sans-serif;min-height:100vh}
-.wrap{max-width:1400px;margin:0 auto;padding:28px 16px 40px}
+.wrap{max-width:1720px;margin:0 auto;padding:28px 16px 40px}
 header{text-align:center;margin-bottom:26px}
 .kicker{color:var(--gold);font-weight:700;letter-spacing:.08em;margin:0 0 6px;font-size:clamp(14px,1.4vw,18px)}
 h1{margin:0;font-size:clamp(30px,4vw,54px);font-weight:900}
 .lead{color:var(--muted);margin:10px 0 0;font-size:clamp(15px,1.5vw,20px)}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.grid{display:grid;grid-template-columns:repeat(5,1fr);gap:18px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 20px;display:flex;flex-direction:column;align-items:center;text-align:center;border-top:6px solid var(--c)}
 .no{display:inline-block;background:var(--c);color:#0b1020;font-weight:900;border-radius:999px;padding:4px 14px;font-size:clamp(14px,1.2vw,17px)}
 .emo{font-size:clamp(40px,4vw,58px);line-height:1;margin:14px 0 6px}
 .card h2{margin:0;font-size:clamp(22px,2vw,30px);font-weight:900}
 .topic{color:var(--muted);margin:6px 0 14px;font-size:clamp(14px,1.2vw,17px);min-height:2.6em}
-.qr{background:#fff;border-radius:16px;padding:12px;width:100%;max-width:260px;aspect-ratio:1;border:0;cursor:zoom-in;display:block}
-.qr svg{width:100%;height:100%;display:block}
+.qr{background:#1d2747;border:3px dashed var(--c);border-radius:16px;padding:12px;width:100%;max-width:260px;aspect-ratio:1;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:var(--ink);font:inherit}
+.qr:hover{background:#25315a}
+.qr .ic{font-size:clamp(46px,4.4vw,70px);line-height:1}
+.qr .lb{font-weight:900;font-size:clamp(18px,1.6vw,24px)}
+.qr .sm{color:var(--muted);font-size:clamp(12px,1vw,14px)}
+.pq{display:none}
 .ws{margin:14px 0 12px;background:var(--green);color:#03230f;font-weight:900;border-radius:999px;padding:5px 16px;font-size:clamp(14px,1.2vw,17px)}
 .go{color:var(--ink);text-decoration:none;font-weight:700;border:1px solid var(--line);border-radius:12px;padding:10px 16px;width:100%;max-width:260px;display:block;background:#1d2747}
 .go:hover{border-color:var(--c)}
@@ -35,7 +39,8 @@ h1{margin:0;font-size:clamp(30px,4vw,54px);font-weight:900}
 #big .box svg{width:100%;height:100%;display:block}
 #big h3{margin:0 0 16px;font-size:clamp(26px,3.6vw,48px);font-weight:900;text-align:center}
 #big p{color:var(--muted);margin:14px 0 0;font-size:18px}
-@media (max-width:1100px){.grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:1450px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media (max-width:1000px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media (max-width:560px){.grid{grid-template-columns:1fr}}
 @media print{
   body{background:#fff;color:#000}
@@ -44,6 +49,9 @@ h1{margin:0;font-size:clamp(30px,4vw,54px);font-weight:900}
   .lead,.topic,.url{color:#444}
   .go,.tip,#big{display:none!important}
   .ws{background:#fff;border:2px solid #000}
+  .qr{display:none}
+  .pq{display:block;width:100%;max-width:220px;aspect-ratio:1}
+  .pq svg{width:100%;height:100%;display:block}
 }
 </style>
 </head>
@@ -52,15 +60,16 @@ h1{margin:0;font-size:clamp(30px,4vw,54px);font-weight:900}
   <header>
     <p class="kicker">Ⅶ. 태양계 · 수업 자료</p>
     <h1>🔭 태양계 관측소 모음</h1>
-    <p class="lead">휴대폰·태블릿 카메라로 QR 코드를 찍으면 바로 들어가요.</p>
+    <p class="lead">📱 QR 코드 보기를 누르고, 휴대폰·태블릿 카메라로 찍으면 바로 들어가요.</p>
   </header>
   <main class="grid" id="grid"></main>
-  <p class="tip">💡 QR 코드를 누르면 TV 화면에 크게 띄울 수 있어요. (다시 누르거나 Esc로 닫기)</p>
+  <p class="tip">💡 QR 코드는 누를 때만 화면 가득 크게 나와요. (아무 곳이나 다시 누르거나 Esc로 닫기)</p>
 </div>
 <div id="big" role="dialog" aria-modal="true"><h3 id="bigT"></h3><div class="box" id="bigQ"></div><p id="bigU"></p></div>
 <script>
 const BASE = 'https://arayoddo-cmd.github.io/';
 const L = [
+  { no: '1-1', emo: '🚀', t: '태양계 탐사대', topic: '태양계 구성원과 행성의 분류', ws: '학습지 1~4쪽', repo: 'planet-mission', c: '#ff7fb0' },
   { no: '1-2', emo: '☀️', t: '태양 관측소', topic: '태양과 태양 활동', ws: '학습지 5~7쪽', repo: 'sun-activity', c: '#ffb347' },
   { no: '2-1', emo: '🌏', t: '일주운동 관측소', topic: '지구의 자전과 일주 운동', ws: '학습지 8~9쪽', repo: 'diurnal-motion', c: '#5fd3ff' },
   { no: '2-2', emo: '♈', t: '별자리 달력 관측소', topic: '지구의 공전과 별자리 변화', ws: '학습지 10~12쪽', repo: 'annual-motion', c: '#c4b0ff' },
@@ -70,7 +79,7 @@ const svg = u => { try { const q = qrcode(0, 'M'); q.addData(u); q.make(); retur
 const url = l => BASE + l.repo + '/';
 document.getElementById('grid').innerHTML = L.map((l, i) => `<section class="card" style="--c:${l.c}">
   <span class="no">${l.no}</span><div class="emo">${l.emo}</div><h2>${l.t}</h2><p class="topic">${l.topic}</p>
-  <button class="qr" data-i="${i}" aria-label="${l.t} QR 크게 보기">${svg(url(l))}</button>
+  <button class="qr" data-i="${i}" aria-label="${l.t} QR 코드 보기"><span class="ic">📱</span><span class="lb">QR 코드 보기</span><span class="sm">누르면 크게 나와요</span></button><div class="pq">${svg(url(l))}</div>
   <span class="ws">📒 ${l.ws}</span>
   <a class="go" href="${url(l)}" target="_blank" rel="noopener">바로 들어가기 →</a>
   <div class="url">${url(l).replace('https://', '')}</div></section>`).join('');
